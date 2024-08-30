@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:note_intake_app/services/databse_helper.dart';
 
 class Homescreen extends StatefulWidget {
@@ -46,6 +47,20 @@ class _HomescreenState extends State<Homescreen> {
     await QueryHelper.deleteNote(id);
     ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("The note has been deleted")));
+    _reloadNotes();
+  }
+
+  void _deleteAllNotes() async {
+    final noteCount = await QueryHelper.getNoteCount();
+    if (noteCount > 0) {
+      await QueryHelper.deleteAllNotes();
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text("All note has been deleted"),
+      ));
+    } else {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text("No notes to delete")));
+    }
     _reloadNotes();
   }
 
@@ -132,6 +147,18 @@ class _HomescreenState extends State<Homescreen> {
       appBar: AppBar(
         title: const Text("Note"),
         centerTitle: true,
+        actions: [
+          IconButton(
+              onPressed: () async {
+                _deleteAllNotes();
+              },
+              icon: const Icon(Icons.delete_forever)),
+          IconButton(
+              onPressed: () {
+                _exitApp();
+              },
+              icon: const Icon(Icons.exit_to_app))
+        ],
       ),
       body: SafeArea(
           child: _isLoading
@@ -191,5 +218,28 @@ class _HomescreenState extends State<Homescreen> {
         child: const Icon(Icons.add),
       ),
     );
+  }
+
+  void _exitApp() {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("Exit App"),
+            content: const Text("Are you sure to exit???"),
+            actions: [
+              OutlinedButton(
+                  onPressed: () {
+                    SystemNavigator.pop();
+                  },
+                  child: const Text("Exit")),
+              OutlinedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text("Cancel"))
+            ],
+          );
+        });
   }
 }
