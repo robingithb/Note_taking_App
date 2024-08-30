@@ -42,6 +42,13 @@ class _HomescreenState extends State<Homescreen> {
     _reloadNotes();
   }
 
+  void _deleteNode(int id) async {
+    await QueryHelper.deleteNote(id);
+    ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("The note has been deleted")));
+    _reloadNotes();
+  }
+
   void showBottomsheetContent(int? id) async {
     if (id != null) {
       final currentNote =
@@ -154,13 +161,19 @@ class _HomescreenState extends State<Homescreen> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   IconButton(
+                                    onPressed: () {
+                                      showBottomsheetContent(
+                                          _allNotes[index]['id']);
+                                    },
+                                    icon: const Icon(
+                                      Icons.edit,
+                                    ),
+                                  ),
+                                  IconButton(
                                       onPressed: () {
-                                        showBottomsheetContent(
-                                            _allNotes[index]['id']);
+                                        _deleteNode(_allNotes[index]['id']);
                                       },
-                                      icon: const Icon(
-                                        Icons.edit,
-                                      ))
+                                      icon: const Icon(Icons.delete))
                                 ],
                               ),
                             ],
