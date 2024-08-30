@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:note_intake_app/ui/homescreen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(const NoteApp());
@@ -13,14 +14,40 @@ class NoteApp extends StatefulWidget {
 }
 
 class _NoteAppState extends State<NoteApp> {
+  ThemeMode _themeMode = ThemeMode.light;
+  Future<void> _loadThemePreferences() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    bool isDarkMode = pref.getBool("isDarkMode") ?? false;
+    setState(() {
+      _themeMode = isDarkMode ? ThemeMode.dark : ThemeMode.light;
+    });
+  }
+
+  Future<void> _toggleTheme(bool isDarkMode) async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState(() {
+      _themeMode = isDarkMode ? ThemeMode.dark : ThemeMode.light;
+      pref.setBool("isDarkMode", isDarkMode);
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadThemePreferences();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: "Note App",
       theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-          useMaterial3: true),
-      home: const Homescreen(),
+          useMaterial3: true,
+          brightness: Brightness.light),
+      darkTheme: ThemeData(brightness: Brightness.dark),
+      themeMode: _themeMode,
+      home: Homescreen(onThemeChanged: _toggleTheme),
     );
   }
 }

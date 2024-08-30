@@ -1,15 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:note_intake_app/services/databse_helper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Homescreen extends StatefulWidget {
-  const Homescreen({super.key});
+  final Function(bool) onThemeChanged;
+  const Homescreen({super.key, required this.onThemeChanged});
 
   @override
   State<Homescreen> createState() => _HomescreenState();
 }
 
 class _HomescreenState extends State<Homescreen> {
+  bool _isDarkMode = false;
+  Future<void> _loadPreferences() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    _isDarkMode = pref.getBool("isDarkMode") ?? false;
+  }
+
+  void _toggleTheme(bool value) {
+    setState(() {
+      _isDarkMode = value;
+      widget.onThemeChanged(_isDarkMode);
+    });
+  }
+
   List<Map<String, dynamic>> _allNotes = [];
   bool _isLoading = true;
 
@@ -29,6 +44,7 @@ class _HomescreenState extends State<Homescreen> {
   void initState() {
     super.initState();
     _reloadNotes();
+    _loadPreferences();
   }
 
   Future _addNote() async {
@@ -157,7 +173,15 @@ class _HomescreenState extends State<Homescreen> {
               onPressed: () {
                 _exitApp();
               },
-              icon: const Icon(Icons.exit_to_app))
+              icon: const Icon(Icons.exit_to_app)),
+          Transform.scale(
+            scale: 0.7,
+            child: Switch(
+                value: _isDarkMode,
+                onChanged: (value) {
+                  _toggleTheme(value);
+                }),
+          )
         ],
       ),
       body: SafeArea(
