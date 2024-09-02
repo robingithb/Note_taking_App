@@ -70,12 +70,14 @@ class _HomescreenState extends State<Homescreen> {
     final noteCount = await QueryHelper.getNoteCount();
     if (noteCount > 0) {
       await QueryHelper.deleteAllNotes();
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text("All note has been deleted"),
+        backgroundColor: _isDarkMode ? Colors.grey : Colors.purple,
       ));
     } else {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text("No notes to delete")));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("No notes to delete"),
+          backgroundColor: _isDarkMode ? Colors.grey : Colors.purple));
     }
     _reloadNotes();
   }
@@ -161,7 +163,11 @@ class _HomescreenState extends State<Homescreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Note"),
+        title: const Text(
+          "Note",
+          style:
+              TextStyle(fontFamily: "IndieFlower", fontWeight: FontWeight.bold),
+        ),
         centerTitle: true,
         actions: [
           IconButton(
@@ -204,6 +210,7 @@ class _HomescreenState extends State<Homescreen> {
                                     _allNotes[index]["title"],
                                     style: const TextStyle(
                                         fontSize: 24,
+                                        fontFamily: "IndieFlower",
                                         fontWeight: FontWeight.bold),
                                   ),
                                 ),
@@ -231,7 +238,8 @@ class _HomescreenState extends State<Homescreen> {
                           ),
                           subtitle: Text(
                             _allNotes[index]["description"],
-                            style: const TextStyle(fontSize: 22),
+                            style: const TextStyle(
+                                fontFamily: "IndieFlower", fontSize: 22),
                           ),
                         ),
                       ))),
